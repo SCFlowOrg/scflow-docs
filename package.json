@@ -1,0 +1,21 @@
+{
+  "name": "scflow-docs",
+  "private": true,
+  "type": "module",
+  "description": "Public documentation site of SCFlow: assembles the topics of the product repositories, holds no content.",
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:site": "node scripts/generate.mjs && astro build",
+    "preview": "astro preview",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.11",
+    "astro": "^7.4.11"
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  }
+}
