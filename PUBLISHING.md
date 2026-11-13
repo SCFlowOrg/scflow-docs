@@ -20,7 +20,10 @@ The site is built by `.github/workflows/site.yml` and served by GitHub Pages on 
 - **Pause publication:** set `PUBLISH_SITE` to anything other than `true`. Builds still run and are checked.
 - **A build fails:** the log of `Generate the content` names the topic and the problem; fix it in the repository that owns the topic, not here.
 
+## Licence
+
+The documentation content is CC BY 4.0, attribution "SCFlow contributors" (see [LICENSE.md](LICENSE.md)); every page carries a notice in its footer. The code of this repository has no licence yet.
+
 ## Still open
 
-- Licence of the documentation content.
 - French topics (the site falls back to English with a notice).
