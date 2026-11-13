@@ -9,7 +9,7 @@ export const collections = {
     loader: docsLoader(),
     schema: docsSchema({
       extend: z.object({
-        id: z.string().regex(/^[a-z0-9][a-z0-9-]*(\/[a-z0-9][a-z0-9._-]*)+$/, "a topic id is namespace/name"),
+        id: z.string().regex(/^[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+(\/[A-Za-z0-9_.-]+)*$/, "a topic id is namespace/name"),
         summary: z.string().min(1),
         kind: z.enum(["tutorial", "how-to", "reference", "explanation"]),
         audience: z.enum(["user", "plugin-dev", "model-dev"]),
