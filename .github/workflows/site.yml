@@ -6,8 +6,6 @@ on:
   pull_request:
   schedule:
     - cron: "17 3 * * *" # nightly, picks up changes of the sources that sent no event
-  repository_dispatch:
-    types: [docs-changed] # sent by the source repositories when their docs change
   workflow_dispatch:
 
 concurrency:

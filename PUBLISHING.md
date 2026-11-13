@@ -16,7 +16,7 @@ The site is built by `.github/workflows/site.yml` and served by GitHub Pages on 
 
 ## Operating it
 
-- **Rebuild triggers:** push to `main`, nightly at 03:17 UTC, a manual run, and `repository_dispatch` of type `docs-changed`. The source repositories do not send that event yet; until they do, the nightly run picks their changes up.
+- **Rebuild triggers:** push to `main`, nightly at 03:17 UTC, and a manual run. The source repositories send no event on purpose, so they need no workflow of their own: a change in their documentation reaches the site at the next nightly run. To publish it at once, click Run workflow (Actions > Documentation site) or run `gh workflow run site.yml -R SCFlowOrg/scflow-docs`.
 - **Pause publication:** set `PUBLISH_SITE` to anything other than `true`. Builds still run and are checked.
 - **A build fails:** the log of `Generate the content` names the topic and the problem; fix it in the repository that owns the topic, not here.
 
@@ -26,5 +26,4 @@ The documentation content is CC BY 4.0, attribution "SCFlow contributors" (see [
 
 ## Still open
 
-- Sending `docs-changed` from the three sources.
 - French topics (the site falls back to English with a notice).

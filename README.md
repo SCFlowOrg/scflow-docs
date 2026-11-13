@@ -38,7 +38,7 @@ npm run dev                                # or: npm run build
 
 ## CI
 
-`.github/workflows/site.yml` runs on push to `main`, pull requests, a nightly schedule, `repository_dispatch` of type `docs-changed` (the sources send it when their docs change) and manually. It checks out the three sources at `main` with the secret `SOURCES_READ_TOKEN` (read access to the three private repos), builds scflow-core with bun, then tests, generates (`--strict`) and builds the site, and uploads the Pages artifact.
+`.github/workflows/site.yml` runs on push to `main`, pull requests, a nightly schedule and manually (the sources send no event, so a change in their documentation reaches the site at the next nightly run, or at once by running the workflow by hand). It checks out the three sources at `main` with the secret `SOURCES_READ_TOKEN` (read access to the three private repos), builds scflow-core with bun, then tests, generates (`--strict`) and builds the site, and uploads the Pages artifact.
 
 The `deploy` job runs on `main` only when the repository variable `PUBLISH_SITE` is `true`. The one-time setup (token, Pages, DNS) is in [PUBLISHING.md](PUBLISHING.md).
 
