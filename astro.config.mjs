@@ -37,6 +37,7 @@ export default defineConfig({
       // Pagefind search is Starlight's default (`pagefind: true`).
       pagefind: true,
       sidebar,
+      components: { Footer: "./src/components/Footer.astro" },
     }),
   ],
 });

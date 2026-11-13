@@ -1,0 +1,23 @@
+---
+// Keeps the default Starlight footer and adds the licence notice under it, on every page.
+import Default from "@astrojs/starlight/components/Footer.astro";
+
+const fr = Astro.currentLocale === "fr";
+const text = fr
+  ? { licence: "Documentation sous licence CC BY 4.0", by: "© les contributeurs de SCFlow", home: "Retour à supplychainflow.org" }
+  : { licence: "Documentation under CC BY 4.0", by: "© SCFlow contributors", home: "Back to supplychainflow.org" };
+---
+
+<Default {...Astro.props}><slot /></Default>
+<p class="licence-notice">
+  <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener">{text.licence}</a> · {text.by} ·
+  <a href="https://supplychainflow.org">{text.home}</a>
+</p>
+
+<style>
+  .licence-notice {
+    margin-top: 1rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+</style>
