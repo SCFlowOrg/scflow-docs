@@ -26,8 +26,10 @@ else {
   const repos = locateRepos(parent);
   const staging = join(root, ".work", "modules");
   catalogue = join(root, ".work", "catalogue");
-  const staged = stageModules(repos, staging);
+  const { staged, skipped } = stageModules(repos, staging);
   console.log(`staged ${staged.length} module(s) from ${parent}`);
+  for (const line of skipped) console.log(`  not staged: ${line}`);
+  if (staged.length === 0) throw new Error("no module with docs found in the source repositories");
   runScflowDocs({ core: repos["scflow-core"], staging, out: catalogue });
 }
 

@@ -1,10 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildPages, rewriteLinks } from "../scripts/lib/convert.mjs";
-import { moduleFolders } from "../scripts/lib/sources.mjs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { moduleFolders, selectModules } from "../scripts/lib/sources.mjs";
 
 const fixture = join(dirname(fileURLToPath(import.meta.url)), "fixtures", "catalogue");
 const manifest = JSON.parse(readFileSync(join(fixture, "docs-manifest.json"), "utf8"));
@@ -68,4 +70,21 @@ test("every page carries the topic fields and each locale has a landing page", (
 
 test("moduleFolders finds module.yaml at the root, in packages/* and plugins/*", () => {
   assert.deepEqual(moduleFolders(join(fixture, "nowhere")), []);
+});
+
+test("selectModules keeps modules with docs, one per name, and skips the rest", () => {
+  const tmp = mkdtempSync(join(tmpdir(), "scflow-docs-"));
+  const module = (repo, folder, lines) => {
+    const dir = join(tmp, repo, folder);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "module.yaml"), lines.join("\n") + "\n");
+  };
+  module("core", "packages/a", ["name: scflow:core", "docs:", "  - id: scflow/x"]);
+  module("plugins", "packages/a", ["name: scflow:core", "docs:", "  - id: scflow/x"]); // synced copy
+  module("plugins", "packages/graph", ["name: scflow:graph", "actions: []"]); // no docs
+  module("plugins", "packages/b", ["name: scflow:b", "docs:", "  - id: b/y"]);
+  const { chosen, skipped } = selectModules({ core: join(tmp, "core"), plugins: join(tmp, "plugins") });
+  const rel = (c) => c.repo + ":" + c.folder.slice(join(tmp, c.repo).length + 1).split(sep).join("/");
+  assert.deepEqual(chosen.map(rel), ["core:packages/a", "plugins:packages/b"]);
+  assert.equal(skipped.length, 2);
 });
