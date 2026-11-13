@@ -44,5 +44,5 @@ The `deploy` job runs on `main` only when the repository variable `PUBLISH_SITE`
 
 ## TODO
 
-- Licence: none chosen yet. To be decided by the owners.
+- Licence: the documentation content is CC BY 4.0, attribution "SCFlow contributors" (see [LICENSE.md](LICENSE.md)). The code of this repository has no licence chosen yet.
 - DNS, the secret and the Pages settings are set up outside this repository, see [PUBLISHING.md](PUBLISHING.md).
