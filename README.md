@@ -40,9 +40,9 @@ npm run dev                                # or: npm run build
 
 `.github/workflows/site.yml` runs on push to `main`, pull requests, a nightly schedule, `repository_dispatch` of type `docs-changed` (the sources send it when their docs change) and manually. It checks out the three sources at `main` with the secret `SOURCES_READ_TOKEN` (read access to the three private repos), builds scflow-core with bun, then tests, generates (`--strict`) and builds the site, and uploads the Pages artifact.
 
-The `deploy` job is written but switched off (`if: false`). To enable: turn on GitHub Pages with the GitHub Actions source, remove that line, and set the custom domain once the DNS CNAME for `docs.supplychainflow.org` exists.
+The `deploy` job runs on `main` only when the repository variable `PUBLISH_SITE` is `true`. The one-time setup (token, Pages, DNS) is in [PUBLISHING.md](PUBLISHING.md).
 
 ## TODO
 
 - Licence: none chosen yet. To be decided by the owners.
-- DNS and the secret are set up outside this repository.
+- DNS, the secret and the Pages settings are set up outside this repository, see [PUBLISHING.md](PUBLISHING.md).

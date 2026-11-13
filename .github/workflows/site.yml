@@ -79,11 +79,10 @@ jobs:
         with:
           path: scflow-docs/dist
 
-  # Prepared, not enabled: `if: false` keeps it off. To enable, turn on GitHub Pages
-  # (Settings > Pages > Source: GitHub Actions), remove the `if` line, and add the
-  # custom domain docs.supplychainflow.org there once the DNS CNAME exists.
+  # Publishes only on main and only once the repository variable PUBLISH_SITE is "true"
+  # (see PUBLISHING.md), so enabling or pausing publication needs no code change.
   deploy:
-    if: false
+    if: github.ref == 'refs/heads/main' && vars.PUBLISH_SITE == 'true'
     needs: build
     runs-on: ubuntu-latest
     permissions:
