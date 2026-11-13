@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "source": "modules",
+  "topics": [
+    { "id": "scflow/undo", "title": "Undo and redo", "summary": "Undo a change.", "kind": "how-to", "audience": "user", "locale": "en", "context": ["documents.history"], "uses": ["scflow/undo"], "generated": false },
+    { "id": "scflow/undo", "title": "Annuler et rétablir", "summary": "Annuler une modification.", "kind": "how-to", "audience": "user", "locale": "fr", "context": ["documents.history"], "uses": ["scflow/undo"], "generated": false },
+    { "id": "scflow/graph", "title": "The graph view", "summary": "Draw a flow graph.", "kind": "tutorial", "audience": "user", "locale": "en", "context": [], "uses": [], "generated": false },
+    { "id": "scflow/actions", "title": "Action reference", "summary": "Every action.", "kind": "reference", "audience": "model-dev", "locale": "en", "context": [], "uses": [], "generated": true },
+    { "id": "framework/plugin-basics", "title": "Plugin basics", "summary": "Write a plugin.", "kind": "explanation", "audience": "plugin-dev", "locale": "en", "context": [], "uses": [], "generated": false }
+  ]
+}

@@ -1,0 +1,97 @@
+name: Documentation site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * *" # nightly, picks up changes of the sources that sent no event
+  repository_dispatch:
+    types: [docs-changed] # sent by the source repositories when their docs change
+  workflow_dispatch:
+
+concurrency:
+  group: docs-site-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scflow-docs
+
+      # The sources are private: SOURCES_READ_TOKEN needs read access to the three.
+      - name: Check out the sources beside this repository
+        uses: actions/checkout@v4
+        with:
+          repository: SCFlowOrg/scflow-core
+          ref: main
+          path: scflow-core
+          token: ${{ secrets.SOURCES_READ_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SCFlowOrg/scflow-framework
+          ref: main
+          path: scflow-framework
+          token: ${{ secrets.SOURCES_READ_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SCFlowOrg/scflow-plugins
+          ref: main
+          path: scflow-plugins
+          token: ${{ secrets.SOURCES_READ_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Build scflow-core (the scflow CLI)
+        working-directory: scflow-core
+        run: |
+          bun install --frozen-lockfile
+          bun run build:packages
+
+      - name: Install the site
+        working-directory: scflow-docs
+        run: npm ci
+
+      - name: Test the generator
+        working-directory: scflow-docs
+        run: npm test
+
+      - name: Generate the content
+        working-directory: scflow-docs
+        env:
+          SCFLOW_PARENT: ${{ github.workspace }}
+        run: npm run generate -- --strict
+
+      - name: Build the site
+        working-directory: scflow-docs
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: scflow-docs/dist
+
+  # Prepared, not enabled: `if: false` keeps it off. To enable, turn on GitHub Pages
+  # (Settings > Pages > Source: GitHub Actions), remove the `if` line, and add the
+  # custom domain docs.supplychainflow.org there once the DNS CNAME exists.
+  deploy:
+    if: false
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
