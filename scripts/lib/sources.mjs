@@ -1,5 +1,5 @@
 // Finds the three source repositories and gets the merged catalogue from `scflow docs build`.
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, resolve } from "node:path";
 
@@ -24,19 +24,49 @@ export function moduleFolders(repo) {
   return candidates.filter((folder) => existsSync(join(folder, "module.yaml")));
 }
 
-/** Copies every module of the repos into one folder, the `--modules` folder of `scflow docs`. */
+/** What the staging needs of a module.yaml: its name, and whether it declares topics (a top-level `docs:`). */
+export function readManifestInfo(folder) {
+  const text = readFileSync(join(folder, "module.yaml"), "utf8");
+  return { name: /^name:\s*(\S+)/m.exec(text)?.[1], hasDocs: /^docs:/m.test(text) };
+}
+
+/**
+ * The modules to stage, in repo order: only those that declare `docs:` (a module with
+ * none gives no topic, and one whose code is not built, such as scflow:graph, would fail
+ * the load of `scflow docs`), and one folder per module name (scflow-plugins carries a
+ * synced copy of scflow:core: the first one wins). `skipped` says why for the log.
+ */
+export function selectModules(repos) {
+  const chosen = [];
+  const skipped = [];
+  const seen = new Map();
+  for (const [name, repo] of Object.entries(repos)) {
+    for (const folder of moduleFolders(repo)) {
+      const info = readManifestInfo(folder);
+      const where = `${name}:${folder === repo ? "." : folder.slice(repo.length + 1)}`;
+      if (!info.hasDocs) skipped.push(`${where} (${info.name ?? "?"}): no docs`);
+      else if (info.name && seen.has(info.name)) skipped.push(`${where} (${info.name}): same module as ${seen.get(info.name)}`);
+      else {
+        if (info.name) seen.set(info.name, where);
+        chosen.push({ repo: name, root: repo, folder });
+      }
+    }
+  }
+  return { chosen, skipped };
+}
+
+/** Copies the selected modules into one folder, the `--modules` folder of `scflow docs`. */
 export function stageModules(repos, staging) {
   rmSync(staging, { recursive: true, force: true });
   mkdirSync(staging, { recursive: true });
+  const { chosen, skipped } = selectModules(repos);
   const staged = [];
-  for (const [name, repo] of Object.entries(repos)) {
-    for (const folder of moduleFolders(repo)) {
-      const target = join(staging, `${name}--${folder === repo ? "root" : folder.slice(repo.length + 1).replace(/[\/]/g, "-")}`);
-      cpSync(folder, target, { recursive: true, filter: (src) => !/[\/](node_modules|\.git)([\/]|$)/.test(src) });
-      staged.push(target);
-    }
+  for (const { repo, root, folder } of chosen) {
+    const target = join(staging, `${repo}--${folder === root ? "root" : folder.slice(root.length + 1).replace(/[\\/]/g, "-")}`);
+    cpSync(folder, target, { recursive: true, filter: (src) => !/[\\/](node_modules|\.git)([\\/]|$)/.test(src) });
+    staged.push(target);
   }
-  return staged;
+  return { staged, skipped };
 }
 
 /**
