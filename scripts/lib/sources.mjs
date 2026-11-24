@@ -74,7 +74,7 @@ export function stageModules(repos, staging) {
  * The command is `SCFLOW_CLI` (e.g. `scflow`), else the built CLI of scflow-core.
  */
 export function runScflowDocs({ core, staging, out, cli = process.env.SCFLOW_CLI }) {
-  const [command, ...prefix] = cli ? cli.split(" ") : ["node", join(core, "packages/repl/dist/scflowCli.js")];
+  const [command, ...prefix] = cli ? cli.split(" ") : ["node", join(core, "packages/cli/dist/scflowCli.js")];
   if (!cli && !existsSync(prefix[0])) throw new Error(`scflow CLI not built: ${prefix[0]} is missing (build scflow-core, or set SCFLOW_CLI)`);
   const run = (args) => {
     const result = spawnSync(command, [...prefix, "docs", ...args], { encoding: "utf8", shell: process.platform === "win32" && Boolean(cli) });
